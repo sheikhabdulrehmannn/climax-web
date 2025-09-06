@@ -1,0 +1,165 @@
+/* Climax Hosiery - Splash Screen Animation */
+
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: var(--white);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.splash-screen.hidden {
+  display: none;
+}
+
+.splash-logo {
+  width: 120px;
+  height: auto;
+  opacity: 0;
+  transform: scale(1.1) translateY(10px);
+  transition: all 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 10001;
+}
+
+.splash-logo.animate-in {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.splash-logo.animate-out {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 300ms cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+.splash-bars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 10002;
+}
+
+.splash-bar {
+  position: absolute;
+  width: 150vw;
+  height: 40vh;
+  background: #000000;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  transition: transform 400ms cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+.splash-bar-1 {
+  top: -20vh;
+  right: -75vw;
+  transform: rotate(-45deg) translateX(200vw);
+}
+
+.splash-bar-2 {
+  top: 10vh;
+  right: -75vw;
+  transform: rotate(-45deg) translateX(200vw);
+}
+
+.splash-bar-3 {
+  top: 40vh;
+  right: -75vw;
+  transform: rotate(-45deg) translateX(200vw);
+}
+
+.splash-bar.animate-in {
+  transform: rotate(-45deg) translateX(0);
+}
+
+.splash-bar.animate-out {
+  transform: rotate(-45deg) translateX(-200vw);
+}
+
+/* Animation timing classes */
+.splash-bar-1.animate-in {
+  transition-delay: 0ms;
+}
+
+.splash-bar-2.animate-in {
+  transition-delay: 120ms;
+}
+
+.splash-bar-3.animate-in {
+  transition-delay: 240ms;
+}
+
+.splash-bar-1.animate-out {
+  transition-delay: 240ms;
+}
+
+.splash-bar-2.animate-out {
+  transition-delay: 120ms;
+}
+
+.splash-bar-3.animate-out {
+  transition-delay: 0ms;
+}
+
+/* Prevent body scroll during splash */
+body.splash-active {
+  overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .splash-logo {
+    width: 100px;
+  }
+  
+  .splash-bar {
+    height: 35vh;
+  }
+  
+  .splash-bar-1 {
+    top: -15vh;
+  }
+  
+  .splash-bar-2 {
+    top: 15vh;
+  }
+  
+  .splash-bar-3 {
+    top: 45vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .splash-logo {
+    width: 80px;
+  }
+  
+  .splash-bar {
+    height: 30vh;
+  }
+}
+
+/* Accessibility - respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .splash-logo,
+  .splash-bar {
+    transition-duration: 100ms;
+  }
+  
+  .splash-bar-1.animate-in,
+  .splash-bar-2.animate-in,
+  .splash-bar-3.animate-in,
+  .splash-bar-1.animate-out,
+  .splash-bar-2.animate-out,
+  .splash-bar-3.animate-out {
+    transition-delay: 0ms;
+  }
+}
