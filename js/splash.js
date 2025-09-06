@@ -9,8 +9,8 @@ class SplashScreen {
     this.isAnimating = false;
     this.hasShown = false;
     
-    // Check if splash should be shown (only on first visit)
-    this.shouldShow = !sessionStorage.getItem('splash-shown');
+    // Show splash screen on every page reload
+    this.shouldShow = true;
     
     this.init();
   }
@@ -77,35 +77,35 @@ class SplashScreen {
   startAnimation() {
     this.isAnimating = true;
     
-    // Stage A: Logo Intro (0-500ms)
+    // Stage A: Logo Intro (0-800ms)
     setTimeout(() => {
       this.logoElement.classList.add('animate-in');
-    }, 250);
+    }, 400);
     
-    // Stage B: Cross-Angle Mask - Bars In (500-1060ms)
+    // Stage B: Cross-Angle Mask - Bars In (800-1600ms)
     setTimeout(() => {
       this.barElements.forEach(bar => {
         bar.classList.add('animate-in');
       });
-    }, 500);
+    }, 800);
     
-    // Stage C: Logo Scale Out (1060-1200ms)
+    // Stage C: Logo Scale Out (1600-1800ms)
     setTimeout(() => {
       this.logoElement.classList.add('animate-out');
-    }, 1060);
+    }, 1600);
     
-    // Stage D: Reverse Reveal (1200-1500ms)
+    // Stage D: Reverse Reveal (1800-2200ms)
     setTimeout(() => {
       this.barElements.forEach(bar => {
         bar.classList.remove('animate-in');
         bar.classList.add('animate-out');
       });
-    }, 1200);
+    }, 1800);
     
-    // Complete animation and cleanup (1500ms)
+    // Complete animation and cleanup (2200ms)
     setTimeout(() => {
       this.completeAnimation();
-    }, 1500);
+    }, 2200);
   }
   
   skipAnimation() {
@@ -117,9 +117,6 @@ class SplashScreen {
   
   completeAnimation() {
     this.isAnimating = false;
-    
-    // Mark splash as shown for this session
-    sessionStorage.setItem('splash-shown', 'true');
     
     // Remove splash screen
     if (this.splashElement) {
@@ -153,24 +150,24 @@ class SplashScreen {
   
   // Public method to force show splash (for testing)
   static forceShow() {
-    sessionStorage.removeItem('splash-shown');
     location.reload();
   }
   
   // Public method to disable splash for session
   static disable() {
-    sessionStorage.setItem('splash-shown', 'true');
+    // Create a flag to disable splash for current session
+    window.splashDisabled = true;
   }
 }
 
 // Initialize splash screen when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Only show splash on homepage
+  // Show splash on homepage every time (unless manually disabled)
   const isHomepage = window.location.pathname === '/' || 
                     window.location.pathname === '/index.html' ||
                     window.location.pathname.endsWith('/');
   
-  if (isHomepage) {
+  if (isHomepage && !window.splashDisabled) {
     window.splashScreen = new SplashScreen();
   }
 });

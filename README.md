@@ -139,7 +139,7 @@ All placeholder content is clearly marked with `[TODO:]` comments:
 ### JavaScript Features
 - Intersection Observer for scroll animations
 - Lazy loading for images
-- Sophisticated splash screen animation with diagonal bars
+- Sophisticated splash screen animation with diagonal bars (2.2 seconds, shows on every reload)
 - Form validation and submission handling
 - Mobile menu functionality
 - Image gallery lightbox
