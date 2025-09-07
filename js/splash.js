@@ -1,4 +1,4 @@
-/* Climax Hosiery - Splash Screen Controller */
+/* Climax Hosiery - New Splash Screen Controller */
 
 class SplashScreen {
   constructor() {
@@ -7,26 +7,46 @@ class SplashScreen {
     this.barsElement = null;
     this.barElements = [];
     this.isAnimating = false;
-    this.hasShown = false;
     
-    // Show splash screen on every page reload
-    this.shouldShow = true;
+    // Only show on direct page loads/reloads, not internal navigation
+    this.shouldShow = this.isDirectPageLoad();
     
-    this.init();
+    if (this.shouldShow) {
+      this.init();
+    }
+  }
+  
+  isDirectPageLoad() {
+    // Check if this is a direct page load or reload
+    // Performance navigation API to detect reload vs navigation
+    if (performance.navigation) {
+      // Legacy API
+      return performance.navigation.type === performance.navigation.TYPE_RELOAD || 
+             performance.navigation.type === performance.navigation.TYPE_NAVIGATE;
+    } else if (performance.getEntriesByType) {
+      // Modern API
+      const navEntries = performance.getEntriesByType('navigation');
+      if (navEntries.length > 0) {
+        const navType = navEntries[0].type;
+        return navType === 'reload' || navType === 'navigate';
+      }
+    }
+    
+    // Fallback: check if referrer is same origin (internal navigation)
+    const isInternalNavigation = document.referrer && 
+                                new URL(document.referrer).origin === window.location.origin;
+    
+    return !isInternalNavigation;
   }
   
   init() {
-    if (!this.shouldShow) {
-      return;
-    }
-    
     this.createSplashHTML();
     this.bindEvents();
     this.startAnimation();
   }
   
   createSplashHTML() {
-    // Create splash screen container
+    // Create splash screen container (starts black)
     this.splashElement = document.createElement('div');
     this.splashElement.className = 'splash-screen';
     
@@ -77,41 +97,72 @@ class SplashScreen {
   startAnimation() {
     this.isAnimating = true;
     
-    // Stage A: Logo Intro (0-800ms)
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (prefersReducedMotion) {
+      this.runReducedMotionAnimation();
+      return;
+    }
+    
+    // FRAME 1-2: Logo Fade-In (0-500ms)
     setTimeout(() => {
       this.logoElement.classList.add('animate-in');
-    }, 400);
+    }, 100);
     
-    // Stage B: Cross-Angle Mask - Bars In (800-1600ms)
+    // FRAME 3-4: Logo Shrink and Disappear (500-900ms)
     setTimeout(() => {
+      this.logoElement.classList.add('animate-shrink');
+    }, 500);
+    
+    // FRAME 5-6: Bars Appear (900-1200ms)
+    setTimeout(() => {
+      this.barsElement.classList.add('visible');
       this.barElements.forEach(bar => {
         bar.classList.add('animate-in');
       });
-    }, 800);
+    }, 900);
     
-    // Stage C: Logo Scale Out (1600-1800ms)
-    setTimeout(() => {
-      this.logoElement.classList.add('animate-out');
-    }, 1600);
+    // FRAME 7: Hold with bars covering (1200-1400ms)
+    // (Natural pause as bars settle)
     
-    // Stage D: Reverse Reveal (1800-2200ms)
+    // FRAME 8: Bars Retract (1400-1800ms)
     setTimeout(() => {
       this.barElements.forEach(bar => {
         bar.classList.remove('animate-in');
         bar.classList.add('animate-out');
       });
-    }, 1800);
+    }, 1400);
     
-    // Complete animation and cleanup (2200ms)
+    // Complete animation and cleanup (1800ms)
     setTimeout(() => {
       this.completeAnimation();
-    }, 2200);
+    }, 1800);
+  }
+  
+  runReducedMotionAnimation() {
+    // Simple fade for reduced motion users
+    setTimeout(() => {
+      this.logoElement.classList.add('animate-in');
+    }, 100);
+    
+    setTimeout(() => {
+      this.logoElement.classList.add('animate-shrink');
+    }, 400);
+    
+    setTimeout(() => {
+      this.splashElement.classList.add('fade-out');
+    }, 700);
+    
+    setTimeout(() => {
+      this.completeAnimation();
+    }, 1000);
   }
   
   skipAnimation() {
     if (!this.isAnimating) return;
     
-    // Clear any pending timeouts
+    // Clear any pending timeouts and complete immediately
     this.completeAnimation();
   }
   
@@ -131,7 +182,7 @@ class SplashScreen {
       }, 100);
     }
     
-    // Trigger any post-splash initialization
+    // Trigger completion event
     this.onSplashComplete();
   }
   
@@ -152,22 +203,17 @@ class SplashScreen {
   static forceShow() {
     location.reload();
   }
-  
-  // Public method to disable splash for session
-  static disable() {
-    // Create a flag to disable splash for current session
-    window.splashDisabled = true;
-  }
 }
 
 // Initialize splash screen when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Show splash on homepage every time (unless manually disabled)
+  // Only show on homepage and only for direct loads/reloads
   const isHomepage = window.location.pathname === '/' || 
                     window.location.pathname === '/index.html' ||
-                    window.location.pathname.endsWith('/');
+                    window.location.pathname.endsWith('/') ||
+                    window.location.pathname === '';
   
-  if (isHomepage && !window.splashDisabled) {
+  if (isHomepage) {
     window.splashScreen = new SplashScreen();
   }
 });

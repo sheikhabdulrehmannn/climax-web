@@ -140,6 +140,7 @@ All placeholder content is clearly marked with `[TODO:]` comments:
 - Intersection Observer for scroll animations
 - Lazy loading for images
 - Sophisticated splash screen animation with diagonal bars (2.2 seconds, shows on every reload)
+- Sophisticated splash screen animation with diagonal bars (1.8 seconds, shows on direct page loads/reloads only)
 - Form validation and submission handling
 - Mobile menu functionality
 - Image gallery lightbox
